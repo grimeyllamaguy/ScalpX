@@ -1,0 +1,6 @@
+{
+  "account_sid": "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "auth_token": "your_auth_token",
+  "from_number": "+10000000000",
+  "to_number": "+10000000000"
+}
