@@ -1,0 +1,150 @@
+# 30/45: /frontend/package.json
+{
+  "name": "scalpx-dashboard",
+  "version": "1.0.0",
+  "description": "ScalpX UI for real-time signal monitoring",
+  "main": "index.jsx",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "vite": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0"
+  }
+}
+
+# 31/45: /frontend/src/index.jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './components/ChartView';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+# 32/45: /frontend/src/components/ChartView.jsx
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const ChartView = () => {
+  const [signalData, setSignalData] = useState(null);
+
+  useEffect(() => {
+    const fetchSignal = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/signal');
+        setSignalData(res.data);
+      } catch (err) {
+        console.error('Failed to fetch signal:', err);
+      }
+    };
+    fetchSignal();
+  }, []);
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>📊 ScalpX Live Signal</h1>
+      {signalData ? (
+        <div>
+          <p><strong>Symbol:</strong> {signalData.symbol}</p>
+          <p><strong>Price:</strong> ${signalData.price}</p>
+          <p><strong>Signal:</strong> {signalData.signal}</p>
+        </div>
+      ) : (
+        <p>Loading signal...</p>
+      )}
+    </div>
+  );
+};
+
+export default ChartView;
+
+# 33/45: /frontend/src/components/SettingsPanel.jsx
+import React from 'react';
+
+const SettingsPanel = ({ settings, updateSetting }) => {
+  return (
+    <div style={{ padding: '20px', marginTop: '20px', borderTop: '1px solid #ccc' }}>
+      <h2>⚙️ Settings</h2>
+      <label>
+        RSI Threshold:
+        <input
+          type="number"
+          value={settings.rsi}
+          onChange={e => updateSetting('rsi', e.target.value)}
+          style={{ marginLeft: '10px' }}
+        />
+      </label>
+      <br /><br />
+      <label>
+        VWAP Proximity %:
+        <input
+          type="number"
+          value={settings.vwap}
+          onChange={e => updateSetting('vwap', e.target.value)}
+          style={{ marginLeft: '10px' }}
+        />
+      </label>
+    </div>
+  );
+};
+
+export default SettingsPanel;
+
+# 34/45: /frontend/src/components/TradeReplay.jsx
+import React, { useState } from 'react';
+
+const TradeReplay = ({ trades }) => {
+  const [step, setStep] = useState(0);
+
+  const next = () => setStep(prev => Math.min(prev + 1, trades.length - 1));
+  const prev = () => setStep(prev => Math.max(prev - 1, 0));
+
+  const current = trades[step];
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h2>🎬 Trade Replay</h2>
+      {current ? (
+        <div>
+          <p><strong>Step {step + 1} of {trades.length}</strong></p>
+          <p><strong>Symbol:</strong> {current.symbol}</p>
+          <p><strong>Entry:</strong> {current.entry}</p>
+          <p><strong>Exit:</strong> {current.exit}</p>
+          <p><strong>Result:</strong> {current.result}</p>
+          <p><strong>Notes:</strong> {current.notes}</p>
+        </div>
+      ) : (
+        <p>No trades to replay.</p>
+      )}
+      <button onClick={prev} disabled={step === 0}>⏪ Prev</button>
+      <button onClick={next} disabled={step === trades.length - 1}>Next ⏩</button>
+    </div>
+  );
+};
+
+export default TradeReplay;
+
+# 35/45: /frontend/src/assets/logo.svg
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="black" strokeWidth="2">
+    <path d="M10 50 L10 10 L30 10 L30 50 Z" fill="green"/>
+    <path d="M35 50 L35 20 L55 20 L55 50 Z" fill="red"/>
+    <path d="M60 50 L60 30 L80 30 L80 50 Z" fill="green"/>
+  </g>
+  <text x="90" y="35" fontSize="24" fontFamily="Arial" fill="black">SCALPX</text>
+  <circle cx="160" cy="30" r="12" fill="black"/>
+  <text x="154" y="34" fontSize="14" fontFamily="Arial" fill="white">🧠</text>
+</svg>

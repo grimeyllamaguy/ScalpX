@@ -1,0 +1,1 @@
+python scalpx_daily_report.py
